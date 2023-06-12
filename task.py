@@ -23,6 +23,7 @@ def main():
     java.select_window("Chat Frame")
     elements = java.get_elements("role:push button")
     print(elements)
+    java.print_element_tree("basicswing_elementtree.txt")
     java.close_java_window()
 
 

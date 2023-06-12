@@ -27,19 +27,9 @@ Assistant Main
     ${result}=    RPA.Assistant.Run Dialog
     ...    title=Assistant for Java
     ...    on_top=True
-    ...    height=600
+    ...    height=800
+    ...    width=600
     ...    timeout=3600
-
-Using Old Java
-    # lets foreground
-    Select Window By Title    Chat Frame    # bring_foreground=False
-    # ${javas}=    List Java Windows
-    # FOR    ${j}    IN    @{javas}
-    #    Log To Console    ${j}
-    #    Select Window By Pid    ${j.pid}
-    # END
-
-    # Foreground Window    Chat Frame
 
 
 *** Keywords ***
@@ -56,7 +46,13 @@ Display Main Menu
     # END
     ${javas}=    List Java Windows
     Log List    ${javas}    level=WARN
-    IF    len($javas)==1
+
+    IF    len($javas)==0
+        Open Row
+        Add icon    Warning    size=24
+        Add text    There are no detected Java windows
+        Close Row
+    ELSE IF    len($javas)==1
         Add text    Target: ${{ $javas[0].title }}
         IF    not ${JAVA_WINDOW_SELECTED}
             Select Window By Pid    ${{ $javas[0].pid }}
@@ -67,10 +63,14 @@ Display Main Menu
     # Add Button    Inspect Element Tree from file    Show Input Components
     Add Text Input    locator    placeholder=${INSPECT_LOCATOR}    default=${INSPECT_LOCATOR}
     Add Checkbox    only_visible    Only visible    ${INSPECT_ONLY_VISIBLE}
+    Open Row
     Add Button    Inspect    Inspect Tree
     Add Button    Refresh    Application Refresh
+    Close Row
+    Open Row
     Add Button    List element roles    List Element Roles
     Add Button    Check element tree    Show Static Components
+    Close Row
     # Add File Input    file    Select file with element tree output    source=${CURDIR}    file_type=txt
     # Add Text    Get Started:
     # Add Button    Simple Example    Show Example View
