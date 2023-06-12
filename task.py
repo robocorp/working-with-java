@@ -1,6 +1,7 @@
 from RPA.JavaAccessBridge import JavaAccessBridge
 import subprocess
 import time
+import mimetypes
 
 java = JavaAccessBridge(
     ignore_callbacks=False,

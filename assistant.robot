@@ -5,7 +5,7 @@ Library     RPA.JavaAccessBridge
 Library     Process
 Library     Collections
 Library     OperatingSystem
-Library     RPA.Assistant
+Library     CustomAssistant.py    # RPA.Assistant
 Library     RPA.Windows
 
 
@@ -24,7 +24,7 @@ Assistant Main
     ...    The Main task running the Assistant
     ...    Configure your window behaviour here
     Display Main Menu
-    ${result}=    RPA.Assistant.Run Dialog
+    ${result}=    Run Dialog
     ...    title=Assistant for Java
     ...    on_top=True
     ...    height=800
@@ -39,11 +39,6 @@ Display Main Menu
     ...    with buttons to make other views return here.
     Clear Dialog
     Add Heading    Java Assistant
-    # IF    ${SELECTED_FILE}
-    #    Add Text    Selected file: ${SELECTED_FILE}
-    # ELSE
-    #    Add Text    No file selected
-    # END
     ${javas}=    List Java Windows
     Log List    ${javas}    level=WARN
 
@@ -58,10 +53,18 @@ Display Main Menu
             Select Window By Pid    ${{ $javas[0].pid }}
             Set Global Variable    ${JAVA_WINDOW_SELECTED}    ${TRUE}
         END
+        # TODO. Does not yet support selection of the window if there are more than 1
+    ELSE
+        Open Row
+        Add icon    Warning    size=24
+        Add text    Selection of a Java window not possible when there are multiple open.
+        Close Row
     END
 
     # Add Button    Inspect Element Tree from file    Show Input Components
-    Add Text Input    locator    placeholder=${INSPECT_LOCATOR}    default=${INSPECT_LOCATOR}
+    Open Container    padding=5    background_color=lightred
+    Add Text Input    locator    default=${INSPECT_LOCATOR}    placeholder=${INSPECT_LOCATOR}
+    Close Container
     Add Checkbox    only_visible    Only visible    ${INSPECT_ONLY_VISIBLE}
     Open Row
     Add Button    Inspect    Inspect Tree
@@ -69,7 +72,7 @@ Display Main Menu
     Close Row
     Open Row
     Add Button    List element roles    List Element Roles
-    Add Button    Check element tree    Show Static Components
+    Add Button    Check element tree    Check Element Tree
     Close Row
     # Add File Input    file    Select file with element tree output    source=${CURDIR}    file_type=txt
     # Add Text    Get Started:
@@ -96,7 +99,7 @@ Generate List Output
     RETURN    ${output}
 
 Inspect Tree
-    ${lib}=    Get Library Instance    RPA.Assistant
+    ${lib}=    Get Library Instance    CustomAssistant    # RPA.Assistant
     Log To Console    ${{ $lib._client.results }}
     IF    "locator" in $lib._client.results.keys()
         ${visible}=    Set Variable    ${{ bool($lib._client.results['only_visible']) }}
@@ -156,90 +159,13 @@ Back To Main Menu
     Display Main Menu
     Refresh Dialog
 
-Show Static Components
+Check Element Tree
     [Documentation]    Action shows all text, image and icon components
 
     Clear Dialog
-    ${tree}=    Print Element Tree
-    Add Text    ${tree}
-
+    # ${tree}=    Print Element Tree
+    # Add Text    ${tree}
+    ${lib}=    Get Library Instance    RPA.JavaAccessBridge
+    Add DataTable Container    ${lib}
     Add Next Ui Button    Back    Back To Main Menu
     Refresh Dialog
-
-Show Input Components
-    [Documentation]    Action shows all input components
-
-    Clear Dialog
-    Add Heading    Input handling
-
-    Add Text Input    text_input    This is a text input
-    Add Password Input    password    This is a secret
-
-    Add Drop-down
-    ...    name=user_type
-    ...    options=Admin,Maintainer,Operator
-    ...    default=Admin
-    ...    label=Drop-down
-
-    Add Radio Buttons
-    ...    name=radio_button
-    ...    options=Option A,Option B, Option C
-    ...    default=Option A
-    ...    label=Radio Buttons
-
-    Add Slider
-    ...    name=percentage
-    ...    slider_min=0
-    ...    slider_max=100
-    ...    thumb_text={value}%
-    ...    steps=100
-
-    Add Checkbox    checkbox    This is a checkbox    True
-    Add Hidden Input    hidden_field    This is hidden
-
-    Add Next Ui Button    Back    Back To Main Menu
-    Refresh Dialog
-
-Show File Components
-    [Documentation]    Action shows all file input components
-
-    Clear Dialog
-    Add Heading    Select file
-
-    # Add File    ${CURDIR}${/}elementtree.txt    label=Current
-    Add File Input    file    Select file with element tree output    source=${CURDIR}    file_type=txt
-
-    Add Next Ui Button    Back    Back To Main Menu
-
-    Refresh Dialog
-
-Show Example View
-    [Documentation]
-    ...    A clean example view to get started
-    ...    Contains a single action that demonstrates error handling
-
-    Clear Dialog    # We clear the current view when starting to create another view
-    Add Heading    Example with error handling
-    Add Text    The action below causes an error, but we only log it and continue.
-    # A button that calls a keyword that fails
-    Add Button    Get Image - Error handling    Get Data
-
-    # We use "Add Next Ui Button" keyword to generate a back button, that will pass the ${results}
-    # of the dialog to the keyword "Back To Main Menu"
-    Add Next Ui Button    Back    Back To Main Menu
-    Refresh Dialog
-
-Get Data
-    [Documentation]    Example of exception handling
-
-    TRY
-        # This action fails to demostrate the exception handling
-        Get File    notfound.png
-    EXCEPT    message
-        # Handle the exceptions here and perform the actions you want
-        # You can create an error view and jump to there, etc.
-        Log    Handling Get Data error case
-    FINALLY
-        # In this case we just want to continue running the assistant, so we return to the main view
-        Back To Main Menu
-    END

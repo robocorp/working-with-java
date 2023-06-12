@@ -36,22 +36,34 @@ Important aspect to note about element tree is that it is representation of the 
 ## Starting the BasicSwing.jar
 
 ```bash
-> java -jar BasicSwing.jar
+java -jar BasicSwing.jar
 ```
 By default application's title will be "`Chat Frame`" but this JAR file can be started by adding arguments to give the application a different title.
 
 for example.
 ```
-> java -jar BasicSwing.jar "Oracle Applications"
+java -jar BasicSwing.jar "Oracle Applications"
 ```
 
 ## Using Robocorp Assistant to inspect Java application
 
 Probably most interesting approach on how to work with Java application is the Assistant application implementation.
 
+```bash
+Robocorp Task: Assistant
+```
+
 Assistant will automatically use `Select Window` to get access Java available on the system.
 
 <img src="images/assistant.png" style="margin-bottom:20px">
+
+Assistant can be used to test locator against visible and selected Java application by entering locator into input field and then by clicking `Inspect` (the hidden elements can be seen in inspect result by unchecking `Only visible` checkbox) .
+
+The `Refresh` button can be used to call `Application Refresh` keyword of the library.
+
+The `List element roles` button lists all possible different element roles and their count on the application view.
+
+The `Check element tree` opens the application's element tree on new page for view. On a condensed table the element's level on the hierarchy, role, name and coordinates are shown. If element does not have coordinates that are clickable (positive coordinates) then instead of coordinates text "NOT VISIBLE" is shown.
 
 ## Using command line tool `java_tree_reader`
 
@@ -60,7 +72,7 @@ The `java_tree_reader` command line tool is available in Robot's Python environm
 This tool takes in 2 input arguments, first the path to the element tree output file and second the locator you want to run against that element tree output to check for matches.
 
 ```bash
- > java_tree_reader   elementtree.txt   role:push button and name:Send
+java_tree_reader   elementtree.txt   role:push button and name:Send
 ```
 
 ## Learning materials

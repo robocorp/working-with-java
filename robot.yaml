@@ -5,10 +5,6 @@ tasks:
   # Task names here are used when executing the bots, so renaming these is recommended.
   Assistant:
     robotTaskName: Assistant Main
-  Access Multiple Javas:
-    robotTaskName: Access Multiple Javas
-  Start Java Apps:
-    robotTaskName: Start BasicSwing Applications
   Python:
     shell: python task.py
   Debug:
