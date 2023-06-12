@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This repository contains some helpful (hopefully :) ) tips for the developer how to work with
+This repository contains some helpful (hopefully :) ) tips for the developer on how to work with
 Java applications. Especially concentrating on Java application element structure and
 building locators that work.
 
