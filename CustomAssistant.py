@@ -74,19 +74,7 @@ class CustomAssistant(Assistant):
                     Text("Coordinates"),
                 ),
             ],
-            rows=data_rows
-            # rows=[
-            #     DataRow(
-            #         [DataCell(Text("A")), DataCell(Text("1"))],
-            #         selected=True,
-            #         on_select_changed=what_the_hell,
-            #     ),
-            #     DataRow(
-            #         [DataCell(Text("B")), DataCell(Text("2"))],
-            #         selected=False,
-            #         on_select_changed=what_the_hell,
-            #     ),
-            # ],
+            rows=data_rows,
         )
 
         self._client.add_element(dt)
