@@ -65,6 +65,8 @@ The `List element roles` button lists all possible different element roles and t
 
 The `Check element tree` opens the application's element tree on new page for view. On a condensed table the element's level on the hierarchy, role, name and coordinates are shown. If element does not have coordinates that are clickable (positive coordinates) then instead of coordinates text "NOT VISIBLE" is shown.
 
+<img src="images/check_element_tree.png" style="margin-bottom:20px">
+
 ## Using command line tool `java_tree_reader`
 
 The `java_tree_reader` command line tool is available in Robot's Python environment, which can be launched with Robocorp Extension's `Open Robot Terminal`.
@@ -74,6 +76,8 @@ This tool takes in 2 input arguments, first the path to the element tree output 
 ```bash
 java_tree_reader   elementtree.txt   role:push button and name:Send
 ```
+
+<img src="images/java_tree_reader.png" style="margin-bottom:20px">
 
 ## Learning materials
 
