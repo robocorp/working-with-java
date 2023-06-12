@@ -20,8 +20,21 @@ def close_application(title):
     java.click_element("name:Exit ok")
 
 
+def iterating_context_tree():
+    for item in java.context_info_tree:
+        print(f"\nname: {item.context_info.name}")
+        print(f"role: {item.context_info.role}")
+        print(f"x: {item.context_info.x}")
+        print(f"y: {item.context_info.y}")
+        print(f"width: {item.context_info.width}")
+        print(f"height: {item.context_info.height}")
+        print(f"states: {item.context_info.states}")
+        print(f"ancestry: {item.ancestry}")
+
+
 def main():
-    java.select_window("Chat Frame")
+    java.select_window_by_title("Chat Frame")
+    iterating_context_tree()
     elements = java.get_elements("role:push button")
     print(elements)
     java.print_element_tree("basicswing_elementtree.txt")

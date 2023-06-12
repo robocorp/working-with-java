@@ -33,6 +33,45 @@ The **element tree** is a representation of the Java application's structure and
 
 Important aspect to note about element tree is that it is representation of the **current state** of the application. If application page structure changes in any way then usual method is to call library keyword ``Application Refresh`` so that library's internal model of the structure is updated.
 
+## Iterating Java context tree
+
+**Note.** This will get better in the future releases of `rpaframework` but currently iteration works like this
+
+Robot Framework example (really clunky)
+```robotframework
+Iterating RPA.JavaAccessBridge context_info_tree
+    ${lib}=    Get Library Instance    RPA.JavaAccessBridge
+    Select Window By Title    Oracle Applications
+    FOR    ${item}    IN    @{lib.context_info_tree}
+        Log To Console    \nname: ${{ $item.context_info.name }}
+        Log To Console    role: ${{ $item.context_info.role }}
+        Log To Console    x: ${{ $item.context_info.x }}
+        Log To Console    y: ${{ $item.context_info.y }}
+        Log To Console    width: ${{ $item.context_info.width }}
+        Log To Console    height: ${{ $item.context_info.height }}
+        Log To Console    states: ${{ $item.context_info.states }}
+        Log To Console    ancestry: ${{ $item.ancestry }}
+    END
+```
+
+Python example
+```python
+from RPA.JavaAccessBridge import JavaAccessBridge
+
+java = JavaAccessBridge()
+
+java.select_window_by_title("Oracle Applications")
+for item in java.context_info_tree:
+    print(f"\nname: {item.context_info.name}")
+    print(f"role: {item.context_info.role}")
+    print(f"x: {item.context_info.x}")
+    print(f"y: {item.context_info.y}")
+    print(f"width: {item.context_info.width}")
+    print(f"height: {item.context_info.height}")
+    print(f"states: {item.context_info.states}")
+    print(f"ancestry: {item.ancestry}")
+```
+
 ## Starting the BasicSwing.jar
 
 ```bash

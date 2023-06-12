@@ -13,6 +13,20 @@ ${window2}      short name
 
 
 *** Tasks ***
+Iterating RPA.JavaAccessBridge context_info_tree
+    ${lib}=    Get Library Instance    RPA.JavaAccessBridge
+    Select Window By Title    Oracle Applications
+    FOR    ${item}    IN    @{lib.context_info_tree}
+        Log To Console    \nname: ${{ $item.context_info.name }}
+        Log To Console    role: ${{ $item.context_info.role }}
+        Log To Console    x: ${{ $item.context_info.x }}
+        Log To Console    y: ${{ $item.context_info.y }}
+        Log To Console    width: ${{ $item.context_info.width }}
+        Log To Console    height: ${{ $item.context_info.height }}
+        Log To Console    states: ${{ $item.context_info.states }}
+        Log To Console    ancestry: ${{ $item.ancestry }}
+    END
+
 New version stuff
     ${javas}=    List Java Windows
     FOR    ${java}    IN    @{javas}
