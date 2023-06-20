@@ -1,7 +1,6 @@
 *** Settings ***
 Library     RPA.JavaAccessBridge
 ...             ignore_callbacks=True
-...             access_bridge_path=C:\\Apps\\javasdk19\\bin\\windowsaccessbridge-64.dll
 Library     Process
 Library     Collections
 # Task Setup    Task setup actions

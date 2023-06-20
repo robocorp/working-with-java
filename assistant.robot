@@ -1,7 +1,6 @@
 *** Settings ***
 Library     RPA.JavaAccessBridge
 ...             ignore_callbacks=True
-...             access_bridge_path=C:\\Apps\\javasdk19\\bin\\windowsaccessbridge-64.dll
 Library     Process
 Library     Collections
 Library     OperatingSystem
@@ -42,23 +41,10 @@ Display Main Menu
     ${javas}=    List Java Windows
     Log List    ${javas}    level=WARN
 
-    IF    len($javas)==0
-        Open Row
-        Add icon    Warning    size=24
-        Add text    There are no detected Java windows
-        Close Row
-    ELSE IF    len($javas)==1
-        Add text    Target: ${{ $javas[0].title }}
-        IF    not ${JAVA_WINDOW_SELECTED}
-            Select Window By Pid    ${{ $javas[0].pid }}
-            Set Global Variable    ${JAVA_WINDOW_SELECTED}    ${TRUE}
-        END
-        # TODO. Does not yet support selection of the window if there are more than 1
-    ELSE
-        Open Row
-        Add icon    Warning    size=24
-        Add text    Selection of a Java window not possible when there are multiple open.
-        Close Row
+    IF    len($javas)>0
+        @{titles}=    Evaluate    [obj.title for obj in $javas]
+        ${default}=    Evaluate    max(@{titles}, key = len)
+        Add Drop-Down  name=selected_java_window  options=@{titles}  default=${default}  label=Select window
     END
 
     # Add Button    Inspect Element Tree from file    Show Input Components
@@ -67,8 +53,8 @@ Display Main Menu
     Close Container
     Add Checkbox    only_visible    Only visible    ${INSPECT_ONLY_VISIBLE}
     Open Row
-    Add Button    Inspect    Inspect Tree
-    Add Button    Refresh    Application Refresh
+    Add Next UI Button    Inspect    Inspect Tree
+    Add Next UI Button    Refresh    Refresh Element Tree
     Close Row
     Open Row
     Add Button    List element roles    List Element Roles
@@ -90,6 +76,32 @@ Display Main Menu
     END
     Add Submit Buttons    buttons=Close    default=Close
 
+Find Selected Window
+    [Arguments]  ${java_windows}  ${selected_title}
+    FOR    ${java_window}    IN    @{java_windows}
+        Log    ${java_window}
+        IF  "${java_window.title}" == "${selected_title}"
+            RETURN  ${java_window}
+        END
+    END
+
+Select Java Window
+    [Arguments]  ${result}
+    ${javas}=    List Java Windows
+    IF  not $result.selected_java_window
+        Open Row
+        Add icon    Warning    size=24
+        Add text    There are no detected Java windows
+        Close Row
+    ELSE
+        ${selected_java_window}=  Find Selected Window  ${javas}  ${result.selected_java_window}
+        Add text    Target: ${{ $selected_java_window.title }}
+        IF    not ${JAVA_WINDOW_SELECTED}
+            Select Window By Title    ${{ $selected_java_window.title }}
+            Set Global Variable    ${JAVA_WINDOW_SELECTED}    ${TRUE}
+        END
+    END
+
 Generate List Output
     [Arguments]    ${thelist}
     ${output}=    Set Variable    ${EMPTY}
@@ -98,7 +110,14 @@ Generate List Output
     END
     RETURN    ${output}
 
+Refresh Element Tree
+    [Arguments]  ${result}
+    Select Java Window  ${result}
+    Application Refresh
+
 Inspect Tree
+    [Arguments]  ${result}
+    Select Java Window  ${result}
     ${lib}=    Get Library Instance    CustomAssistant    # RPA.Assistant
     Log To Console    ${{ $lib._client.results }}
     IF    "locator" in $lib._client.results.keys()
