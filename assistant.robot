@@ -3,7 +3,7 @@ Library     RPA.JavaAccessBridge
 ...             ignore_callbacks=True
 Library     Process
 Library     Collections
-Library     OperatingSystem
+Library     RPA.FileSystem
 Library     CustomAssistant.py    # RPA.Assistant
 Library     RPA.Windows
 
@@ -14,7 +14,8 @@ ${SELECTED_FILE}            ${NONE}
 &{FOUND_ROLES}              &{EMPTY}
 ${JAVA_WINDOW_SELECTED}     ${FALSE}
 ${INSPECT_ONLY_VISIBLE}     ${TRUE}
-${INSPECT_LOCATOR}          Insert locator..
+${INSPECT_LOCATOR}          ${NONE}
+${ELEMENT_TREE_FILE}        %{ROBOT_ARTIFACTS}${/}element-tree.txt
 
 
 *** Tasks ***
@@ -22,13 +23,13 @@ Assistant Main
     [Documentation]
     ...    The Main task running the Assistant
     ...    Configure your window behaviour here
+
     Display Main Menu
     ${result}=    Run Dialog
     ...    title=Assistant for Java
     ...    on_top=True
     ...    height=800
-    ...    width=600
-    ...    timeout=3600
+    ...    width=800
 
 
 *** Keywords ***
@@ -36,44 +37,50 @@ Display Main Menu
     [Documentation]
     ...    Main UI of the bot. We use the "Back To Main Menu" keyword
     ...    with buttons to make other views return here.
+ 
     Clear Dialog
-    Add Heading    Java Assistant
+    Add Heading    Java UI Element Tree Assistant
     ${javas}=    List Java Windows
     Log List    ${javas}    level=WARN
 
     IF    len($javas)>0
         @{titles}=    Evaluate    [obj.title for obj in $javas]
         ${default}=    Evaluate    max(@{titles}, key = len)
-        Add Drop-Down  name=selected_java_window  options=@{titles}  default=${default}  label=Select window
+        Add Drop-Down  name=selected_java_window  options=@{titles}  default=${default}  label=Select Java window and load element tree
+
+        Add Next UI Button    Load/Refresh element Tree       Load Element Tree
+        Add Text    * Remember to load / refresh the tree before performing actions below    Small
+
+        Add Heading    Element Tree Action:   Small
+
+        Add Text    Inspect a locators:
+        Add Text Input    locator    default=${INSPECT_LOCATOR}    placeholder=Insert Locator...
+        Open Row
+        Add Next UI Button    Inspect Locator    Inspect Tree
+        Add Checkbox    only_visible    Target only visible elements    ${INSPECT_ONLY_VISIBLE}
+        Close Row
+
+        Add Text    List roles and the full tree:
+        Open Row
+        Add Button    List element roles    List Element Roles
+        Add Button    List element tree    List element tree
+        Close Row
+
+        IF    ${FOUND_ELEMENTS}
+            ${len}=    Get Length    ${FOUND_ELEMENTS}
+            ${out}=    Generate list output    ${FOUND_ELEMENTS}
+            Log List    ${FOUND_ELEMENTS}    level=WARN
+            Add Text    Result count: ${len}
+            Add Text    ${out}    size=Small
+        END
+        IF    ${FOUND_ROLES}
+            Log List    ${FOUND_ROLES}    level=WARN
+            Add Text    ${FOUND_ROLES}    size=Small
+        END
+    ELSE
+        Add Text    No Java applications open.
     END
 
-    # Add Button    Inspect Element Tree from file    Show Input Components
-    Open Container    padding=5    background_color=lightred
-    Add Text Input    locator    default=${INSPECT_LOCATOR}    placeholder=${INSPECT_LOCATOR}
-    Close Container
-    Add Checkbox    only_visible    Only visible    ${INSPECT_ONLY_VISIBLE}
-    Open Row
-    Add Next UI Button    Inspect    Inspect Tree
-    Add Next UI Button    Refresh    Refresh Element Tree
-    Close Row
-    Open Row
-    Add Button    List element roles    List Element Roles
-    Add Button    Check element tree    Check Element Tree
-    Close Row
-    # Add File Input    file    Select file with element tree output    source=${CURDIR}    file_type=txt
-    # Add Text    Get Started:
-    # Add Button    Simple Example    Show Example View
-    IF    ${FOUND_ELEMENTS}
-        ${len}=    Get Length    ${FOUND_ELEMENTS}
-        ${out}=    Generate list output    ${FOUND_ELEMENTS}
-        Log List    ${FOUND_ELEMENTS}    level=WARN
-        Add Text    Result count: ${len}
-        Add Text    ${out}    size=Small
-    END
-    IF    ${FOUND_ROLES}
-        Log List    ${FOUND_ROLES}    level=WARN
-        Add Text    ${FOUND_ROLES}    size=Small
-    END
     Add Submit Buttons    buttons=Close    default=Close
 
 Find Selected Window
@@ -110,7 +117,7 @@ Generate List Output
     END
     RETURN    ${output}
 
-Refresh Element Tree
+Load Element Tree
     [Arguments]  ${result}
     Select Java Window  ${result}
     Application Refresh
@@ -178,13 +185,17 @@ Back To Main Menu
     Display Main Menu
     Refresh Dialog
 
-Check Element Tree
-    [Documentation]    Action shows all text, image and icon components
+Write element tree to file
+    ${tree}=    Print Element Tree
+    Create file    ${ELEMENT_TREE_FILE}    content=${tree}   overwrite=${True}
 
+List element tree
+    [Documentation]    Action shows all text, image and icon components
     Clear Dialog
-    # ${tree}=    Print Element Tree
-    # Add Text    ${tree}
+
     ${lib}=    Get Library Instance    RPA.JavaAccessBridge
     Add DataTable Container    ${lib}
+
+    Add Button    Write into output/element-tree.txt    Write element tree to file
     Add Next Ui Button    Back    Back To Main Menu
     Refresh Dialog

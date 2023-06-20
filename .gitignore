@@ -18,4 +18,4 @@ testrun/*
 output.xml
 log.html
 report.html
-elementtree.txt
+interactive_console_output.xml
