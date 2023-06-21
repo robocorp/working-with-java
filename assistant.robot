@@ -17,8 +17,7 @@ ${SELECTED_FILE}            ${NONE}
 &{FOUND_ROLES}              &{EMPTY}
 ${JAVA_WINDOW_SELECTED}     ${FALSE}
 ${INSPECT_ONLY_VISIBLE}     ${TRUE}
-#${INSPECT_LOCATOR}          ${NONE}
-${INSPECT_LOCATOR}          role:menu and name:FILE
+${INSPECT_LOCATOR}          ${NONE}
 ${ELEMENT_TREE_FILE}        %{ROBOT_ARTIFACTS}${/}element-tree.txt
 
 
@@ -68,7 +67,7 @@ Display Main Menu
     Add Heading    Actions:   Small
 
     Add Text    Inspect a locators:
-    Add Text Input    locator    default=${INSPECT_LOCATOR}    placeholder=Insert Locator...
+    Add Text Input    locator    default=${INSPECT_LOCATOR}    placeholder=Input Locator e.g.: role:menu and name:FILE
     Open Row
     Add Next UI Button    Inspect Locator    Inspect Tree
     Add Checkbox    only_visible    Target only visible elements    ${INSPECT_ONLY_VISIBLE}
@@ -122,7 +121,7 @@ Generate Element List Output
     [Arguments]    ${thelist}
     ${output}=    Set Variable    ${EMPTY}
     FOR    ${index}    ${entry}    IN ENUMERATE    @{thelist}
-        ${output}=    Set Variable    ${output}${index}: ${entry}\n
+        ${output}=    Set Variable    ${output}${index}: ${entry}\n\n
     END
     RETURN    ${output}
 
@@ -230,4 +229,4 @@ Show Element Results
 
     Add Heading    Results:   Small
     Add Text    Elements Found: ${len}
-    Add Text    ${out}    size=Small
+    Add Text Input   output   default=${out}   minimum_rows=20
