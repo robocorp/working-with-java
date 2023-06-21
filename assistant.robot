@@ -6,15 +6,19 @@ Library     Collections
 Library     RPA.FileSystem
 Library     CustomAssistant.py    # RPA.Assistant
 Library     RPA.Windows
+Library     String
 
 
 *** Variables ***
+${ELEMENT_TREE_LOADED}      ${FALSE}
+${RESULT_ELEMENT_TYPE}      ${NONE}
 ${SELECTED_FILE}            ${NONE}
 @{FOUND_ELEMENTS}           @{EMPTY}
 &{FOUND_ROLES}              &{EMPTY}
 ${JAVA_WINDOW_SELECTED}     ${FALSE}
 ${INSPECT_ONLY_VISIBLE}     ${TRUE}
-${INSPECT_LOCATOR}          ${NONE}
+#${INSPECT_LOCATOR}          ${NONE}
+${INSPECT_LOCATOR}          role:menu and name:FILE
 ${ELEMENT_TREE_FILE}        %{ROBOT_ARTIFACTS}${/}element-tree.txt
 
 
@@ -27,7 +31,7 @@ Assistant Main
     Display Main Menu
     ${result}=    Run Dialog
     ...    title=Assistant for Java
-    ...    on_top=True
+    ...    on_top=False
     ...    height=800
     ...    width=800
     ...    timeout=3600
@@ -44,45 +48,49 @@ Display Main Menu
     ${javas}=    List Java Windows
     Log List    ${javas}    level=WARN
 
-    IF    len($javas)>0
-        @{titles}=    Evaluate    [obj.title for obj in $javas]
-        ${default}=    Evaluate    max(@{titles}, key = len)
-        Add Drop-Down  name=selected_java_window  options=@{titles}  default=${default}  label=Select Java window and load element tree
-
-        Add Next UI Button    Load/Refresh element Tree       Load Element Tree
-        Add Text    * Remember to load / refresh the tree before performing actions below    Small
-
-        Add Heading    Element Tree Action:   Small
-
-        Add Text    Inspect a locators:
-        Add Text Input    locator    default=${INSPECT_LOCATOR}    placeholder=Insert Locator...
-        Open Row
-        Add Next UI Button    Inspect Locator    Inspect Tree
-        Add Checkbox    only_visible    Target only visible elements    ${INSPECT_ONLY_VISIBLE}
-        Close Row
-
-        Add Text    List roles and the full tree:
-        Open Row
-        Add Button    List element roles    List Element Roles
-        Add Button    List element tree    List element tree
-        Close Row
-
-        IF    ${FOUND_ELEMENTS}
-            ${len}=    Get Length    ${FOUND_ELEMENTS}
-            ${out}=    Generate list output    ${FOUND_ELEMENTS}
-            Log List    ${FOUND_ELEMENTS}    level=WARN
-            Add Text    Result count: ${len}
-            Add Text    ${out}    size=Small
-        END
-        IF    ${FOUND_ROLES}
-            Log List    ${FOUND_ROLES}    level=WARN
-            Add Text    ${FOUND_ROLES}    size=Small
-        END
-    ELSE
+    IF   len($javas)==0
         Add Text    No Java applications open.
+        Add Submit Buttons    buttons=Close    default=Close
+        RETURN
+    END
+    
+    @{titles}=    Evaluate    [obj.title for obj in $javas]
+    ${default}=    Evaluate    max(@{titles}, key = len)
+    Add Drop-Down  name=selected_java_window  options=@{titles}  default=${default}  label=Select Java window and load element tree
+
+    Add Next UI Button    Load/Refresh Element Tree       Load Element Tree
+    
+    IF    ${ELEMENT_TREE_LOADED} == ${False}
+        Add Submit Buttons    buttons=Close    default=Close
+        RETURN
     END
 
+    Add Heading    Actions:   Small
+
+    Add Text    Inspect a locators:
+    Add Text Input    locator    default=${INSPECT_LOCATOR}    placeholder=Insert Locator...
+    Open Row
+    Add Next UI Button    Inspect Locator    Inspect Tree
+    Add Checkbox    only_visible    Target only visible elements    ${INSPECT_ONLY_VISIBLE}
+    Close Row
+
+    Add Text    List roles and the full tree:
+    Open Row
+    Add Button    List element roles    List Element Roles
+    Add Button    View element tree    List element tree
+    Add Button    Write element tree to file    Write element tree to file
+    Close Row
+
+    IF    ${RESULT_ELEMENT_TYPE} == "ROLES"
+        Show Roles Results
+    ELSE IF   ${RESULT_ELEMENT_TYPE} == "ELEMENTS"
+        Show Element Results
+    ELSE  
+        Add Submit Buttons    buttons=Close    default=Close
+        RETURN
+    END
     Add Submit Buttons    buttons=Close    default=Close
+
 
 Find Selected Window
     [Arguments]  ${java_windows}  ${selected_title}
@@ -110,7 +118,7 @@ Select Java Window
         END
     END
 
-Generate List Output
+Generate Element List Output
     [Arguments]    ${thelist}
     ${output}=    Set Variable    ${EMPTY}
     FOR    ${index}    ${entry}    IN ENUMERATE    @{thelist}
@@ -122,6 +130,9 @@ Load Element Tree
     [Arguments]  ${result}
     Select Java Window  ${result}
     Application Refresh
+    Set Global Variable    ${ELEMENT_TREE_LOADED}    ${True}
+    Display Main Menu
+    Refresh Dialog
 
 Inspect Tree
     [Arguments]  ${result}
@@ -143,6 +154,7 @@ Inspect Tree
         ELSE
             Set Global Variable    ${FOUND_ELEMENTS}    ${elements}
         END
+        Set Global Variable    ${RESULT_ELEMENT_TYPE}    "ELEMENTS"
     END
     Display Main Menu
     Refresh Dialog
@@ -154,7 +166,9 @@ List Element Roles
     FOR    ${index}    ${item}    IN ENUMERATE    @{lib.context_info_tree}
         Append To List    ${roles}    ${item.context_info.role}
     END
+    ${roles}=     Remove Duplicates    ${roles}
     Set Global Variable    ${FOUND_ROLES}    ${roles}
+    Set Global Variable    ${RESULT_ELEMENT_TYPE}    "ROLES"
     Display Main Menu
     Refresh Dialog
 
@@ -197,6 +211,23 @@ List element tree
     ${lib}=    Get Library Instance    RPA.JavaAccessBridge
     Add DataTable Container    ${lib}
 
-    Add Button    Write into output/element-tree.txt    Write element tree to file
     Add Next Ui Button    Back    Back To Main Menu
     Refresh Dialog
+
+Show Roles Results
+    Log List    ${FOUND_ROLES}    level=WARN
+    ${formatted}=   Evaluate  "\\nrole:".join(${FOUND_ROLES})
+    ${formatted}=   Set Variable  role:${formatted}
+
+    Add Heading    Results:   Small
+    Add Text    Found Roles:
+    Add Text Input   output   default=${formatted}   minimum_rows=5
+
+Show Element Results
+    ${len}=    Get Length    ${FOUND_ELEMENTS}
+    ${out}=    Generate Element List Output    ${FOUND_ELEMENTS}
+    Log List    ${FOUND_ELEMENTS}    level=WARN
+
+    Add Heading    Results:   Small
+    Add Text    Elements Found: ${len}
+    Add Text    ${out}    size=Small
