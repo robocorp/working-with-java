@@ -30,6 +30,7 @@ Assistant Main
     ...    on_top=True
     ...    height=800
     ...    width=800
+    ...    timeout=3600
 
 
 *** Keywords ***
