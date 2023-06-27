@@ -19,7 +19,8 @@ ${JAVA_WINDOW_SELECTED}                 ${FALSE}
 ${SELECTED_WINDOW_NAME}                 ${NONE}
 ${INSPECT_ONLY_VISIBLE}                 ${TRUE}
 ${INSPECT_LOCATOR}                      ${NONE}
-${ELEMENT_TREE_FILE}                    %{ROBOT_ARTIFACTS}${/}locator-tree.txt
+${LOCATOR_TREE_FILE}                    %{ROBOT_ARTIFACTS}${/}locator-tree.txt
+${ELEMENT_TREE_FILE}                    %{ROBOT_ARTIFACTS}${/}element-tree.txt
 ${JAVA_WINDOW_DROPDOWN_SELECTION}       ${NONE}
 
 
@@ -238,6 +239,8 @@ Write locator tree to file
     Select Window By Title    ${SELECTED_WINDOW_NAME}
     Application Refresh
     ${tree}=    Print Locator Tree
+    Create file    ${LOCATOR_TREE_FILE}    content=${tree}    overwrite=${True}
+    ${tree}=    Print Element Tree
     Create file    ${ELEMENT_TREE_FILE}    content=${tree}    overwrite=${True}
 
 List locator tree
