@@ -3,10 +3,7 @@ import subprocess
 import time
 import mimetypes
 
-java = JavaAccessBridge(
-    ignore_callbacks=False,
-    access_bridge_path="C:\\Apps\\javasdk19\\bin\\windowsaccessbridge-64.dll",
-)
+java = JavaAccessBridge(ignore_callbacks=False)
 
 
 def start_application(title: str = ""):
@@ -35,12 +32,18 @@ def iterating_context_tree():
 def main():
     java.select_window_by_title("Chat Frame")
     iterating_context_tree()
-    elements = java.get_elements("role:push button")
-    print(elements)
-    java.print_element_tree("basicswing_elementtree.txt")
-    java.close_java_window()
+    elements = java.get_elements("role:push button", java_elements=True)
+    for e in elements:
+        print(e)
+    # java.print_element_tree("basicswing_elementtree.txt")
+    # java.close_java_window()
+    tree = java.print_locator_tree()
+    tree = tree.replace("| ", "  ")
+    print(tree)
+    winlist = java.list_java_windows()
+    for w in winlist:
+        print(w)
 
 
 if __name__ == "__main__":
-    start_application()
     main()

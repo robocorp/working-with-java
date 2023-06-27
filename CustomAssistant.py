@@ -1,19 +1,18 @@
 from RPA.Assistant import Assistant
-from RPA.Assistant.types import (
-    Icon,
-    LayoutError,
-    Location,
-    Options,
-    Result,
-    Size,
-    VerticalLocation,
-    WindowLocation,
-)
-import logging
-from flet import DataTable, DataCell, DataColumn, Text, DataRow
 from flet_core.control_event import ControlEvent
+
+from flet import (
+    DataTable,
+    DataCell,
+    DataColumn,
+    ElevatedButton,
+    Text,
+    DataRow,
+)
+
 from robot.api.deco import keyword, library
 from robot.libraries.BuiltIn import BuiltIn
+from typing import Union, Callable
 
 
 @library(scope="GLOBAL", doc_format="REST", auto_keywords=False)
@@ -23,8 +22,7 @@ class CustomAssistant(Assistant):
 
     @keyword
     def add_datatable_container(self, java_lib) -> None:
-        def what_the_hell(e):
-            BuiltIn().log_to_console("what the hell")
+        def method_for_table_item_update(e):
             BuiltIn().log_to_console(dir(e))
             BuiltIn().log_to_console(e)
             BuiltIn().log_to_console(dir(e.target))
@@ -78,3 +76,44 @@ class CustomAssistant(Assistant):
         )
 
         self._client.add_element(dt)
+
+    @keyword(tags=["dialog"])
+    def add_next_ui_button_with_tooltip(
+        self, label: str, function: Union[Callable, str], tooltip: str = None
+    ):
+        """Create a button that leads to the next UI page, calling the passed
+        keyword or function, and passing current form results as first positional
+        argument to it.
+
+        :param label: Text for the button
+        :param function: Python function or Robot Keyword name, that will take form
+            results as its first argument
+
+        Example:
+
+        .. code-block:: robotframework
+
+            *** Keywords ***
+            Retrieve User Data
+                # Retrieves advanced data that needs to be displayed
+
+            Main Form
+                Add Heading  Username input
+                Add Text Input  name=username_1  placeholder=username
+                Add Next Ui Button        Show customer details  Customer Details
+
+            Customer Details
+                [Arguments]  ${form}
+                ${user_data}=  Retrieve User Data  ${form}[username_1]
+                Add Heading  Retrieved Data
+                Add Text  ${user_data}[phone_number]
+                Add Text  ${user_data}[address]
+        """
+
+        def on_click(_: ControlEvent):
+            self._callbacks.queue_fn_or_kw(function, self._get_results())
+            self._client.page.set_clipboard(tooltip)
+
+        button = ElevatedButton(label, on_click=on_click, tooltip=tooltip)
+        self._client.add_element(button)
+        self._client.add_to_disablelist(button)
