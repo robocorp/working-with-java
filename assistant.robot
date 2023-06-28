@@ -206,7 +206,7 @@ List Element Roles
     Refresh Dialog
 
 Traversing Element Tree
-    Select Window By Title    Chat Frame
+    Select Window By Title    ${SELECTED_WINDOW_NAME}
     # ${tree}=    Print Element Tree
     ${lib}=    Get Library Instance    Java
     # TODO. ITERATE CONTEXT TREE to count roles etc
