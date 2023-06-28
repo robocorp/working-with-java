@@ -22,6 +22,8 @@ ${INSPECT_LOCATOR}                      ${NONE}
 ${LOCATOR_TREE_FILE}                    %{ROBOT_ARTIFACTS}${/}locator-tree.txt
 ${ELEMENT_TREE_FILE}                    %{ROBOT_ARTIFACTS}${/}element-tree.txt
 ${JAVA_WINDOW_DROPDOWN_SELECTION}       ${NONE}
+${FIND_STRING}                          ${EMPTY}
+${FOUND_LOCATORS_RAW}                   ${EMPTY}
 
 
 *** Tasks ***
@@ -93,13 +95,20 @@ Display Main Menu
     Open Row
     Add Next UI Button    List element roles    List Element Roles
     Add Next UI Button    View locator tree    List Locator Tree
-    Add Next UI Button With Tooltip    Write locator tree to file    Write locator tree to file    ${ELEMENT_TREE_FILE}
+    Add Next UI Button With Tooltip
+    ...    Write locator tree to file
+    ...    Write locator tree to file
+    ...    Files to be saved:\nLocator tree file: ${LOCATOR_TREE_FILE}\nElement tree file: ${ELEMENT_TREE_FILE}
     Close Row
 
     IF    ${RESULT_ELEMENT_TYPE} == "ROLES"
         Show Roles Results
     ELSE IF    ${RESULT_ELEMENT_TYPE} == "ELEMENTS"
         Show Element Results
+    ELSE IF    ${RESULT_ELEMENT_TYPE} == "LOCATORS"
+        Show Locator Results
+    ELSE IF    ${RESULT_ELEMENT_TYPE} == "FIND"
+        Show Locator Results    ${FIND_STRING}
     ELSE
         Add Submit Buttons    buttons=Close    default=Close
         RETURN
@@ -249,15 +258,20 @@ List locator tree
     Set Global Variable    ${SELECTED_WINDOW_NAME}    ${result}[selected_java_window]
     Select Window By Title    ${SELECTED_WINDOW_NAME}
     Application Refresh
-    Clear Dialog
+    # Clear Dialog
 
     ${lib}=    Get Library Instance    Java
     ${tree}=    Print Locator Tree
+    ${raw_tree}=    Get Locator Tree
     # ${tree}=    Evaluate    $tree.replace("| ", "--")    # "${SPACE}${SPACE}")
     # Add DataTable Container    ${lib}
-    Add Text    Found locators:
-    Add Text Input    treeoutput    default=${tree}    minimum_rows=5
-    Add Next Ui Button    Back    Back To Main Menu
+    Set Global Variable    ${FOUND_LOCATORS}    ${tree}
+    Set Global Variable    ${FOUND_LOCATORS_RAW}    ${raw_tree}
+    Set Global Variable    ${RESULT_ELEMENT_TYPE}    "LOCATORS"
+    # Add Text    Found locators:
+    # Add Text Input    treeoutput    default=${tree}    minimum_rows=5
+    # Add Next Ui Button    Back    Back To Main Menu
+    Display Main Menu
     Refresh Dialog
 
 Show Roles Results
@@ -277,3 +291,22 @@ Show Element Results
     Add Heading    Results:    Small
     Add Text    Elements Found: ${len}
     Add Text Input    output    default=${out}    minimum_rows=20
+
+Show Locator Results
+    [Arguments]    ${find_locator}=${NONE}
+    Add Heading    Results:    Small
+    Add Text    Found Locators:
+    Open Row
+    Add Text Input    find    label=Text search    default=${FIND_STRING}    minimum_rows=1    maximum_rows=1
+    Add Next UI Button    Search    Find locator
+    Close Row
+    # Add Text Input    output    default=${FOUND_LOCATORS}    minimum_rows=20
+    Set Global Variable    ${FIND_STRING}    ${NONE}
+    Add DataTable Container    ${FOUND_LOCATORS_RAW}    ${find_locator}
+
+Find Locator
+    [Arguments]    ${result}
+    Set Global Variable    ${RESULT_ELEMENT_TYPE}    "FIND"
+    Set Global Variable    ${FIND_STRING}    ${result}[find]
+    Display Main Menu
+    Refresh Dialog

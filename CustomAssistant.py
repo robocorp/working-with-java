@@ -2,12 +2,14 @@ from RPA.Assistant import Assistant
 from flet_core.control_event import ControlEvent
 
 from flet import (
-    DataTable,
     DataCell,
     DataColumn,
-    ElevatedButton,
-    Text,
     DataRow,
+    DataTable,
+    ElevatedButton,
+    IconButton,
+    Text,
+    icons,
 )
 
 from robot.api.deco import keyword, library
@@ -21,55 +23,71 @@ class CustomAssistant(Assistant):
         super().__init__()
 
     @keyword
-    def add_datatable_container(self, java_lib) -> None:
+    def add_datatable_container(self, data, find=None) -> None:
         def method_for_table_item_update(e):
             BuiltIn().log_to_console(dir(e))
             BuiltIn().log_to_console(e)
             BuiltIn().log_to_console(dir(e.target))
             self._client.flet_update()
 
+        def button_clicked(e):
+            self._client.page.set_clipboard(e.control.data)
+
         data_rows = []
-        for item in java_lib.context_info_tree:
-            coords = (
-                f"x={item.context_info.x} y={item.context_info.y}"
-                if item.context_info.x >= 0
-                else "NOT VISIBLE"
+        for item in data:
+            locator = (
+                f"role:{item.role} and name:{item.name} and "
+                f"description:{item.description} "
+                f"and indexInParent:{item.indexInParent}"
             )
+            text = f"{'|   ' * item.ancestry}{locator}"
+
             data_rows.append(
                 DataRow(
                     [
-                        DataCell(Text(item.ancestry, size=10)),
-                        DataCell(Text(item.context_info.role, size=10)),
-                        DataCell(Text(item.context_info.name, size=10)),
-                        DataCell(Text(coords, size=10)),
-                    ],
+                        DataCell(
+                            IconButton(
+                                icon=icons.CONTENT_COPY_OUTLINED,
+                                icon_color="blue400",
+                                icon_size=12,
+                                tooltip="copy locator to clipboard",
+                                on_click=button_clicked,
+                                data=locator,
+                            )
+                        ),
+                        DataCell(
+                            Text(
+                                text,
+                                size=12,
+                                selectable=True,
+                                color="blue200"
+                                if find and find.lower() in text.lower()
+                                else "white"
+                                # opacity=1 if find and find in text else 0.5,
+                            ),
+                        ),
+                    ]
                 ),
             )
 
         dt = DataTable(
             # width=700,
             # bgcolor="white",
-            border_radius=10,
-            sort_column_index=0,
-            sort_ascending=True,
+            border_radius=1,
             heading_row_color="black",
-            heading_row_height=100,
+            heading_row_height=0,
             data_row_color={"hovered": "black"},
             show_checkbox_column=False,
             divider_thickness=0,
+            horizontal_lines={"width": 0, "color": "black"},
+            data_row_height=35,
             # column_spacing=200,
             columns=[
                 DataColumn(
-                    Text("Element level"),
+                    Text(""),
                 ),
                 DataColumn(
-                    Text("Element role"),
-                ),
-                DataColumn(
-                    Text("Element name"),
-                ),
-                DataColumn(
-                    Text("Coordinates"),
+                    Text(),
                 ),
             ],
             rows=data_rows,

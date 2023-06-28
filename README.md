@@ -12,14 +12,11 @@ Repository consists:
 
 - example Java application `BasicSwing.jar` which is used in ``rpaframework`` testing
 - [RPA.Assistant](https://robocorp.com/docs/libraries/rpa-framework/rpa-assistant) based implementation of developer "Java inspector tool" in `assistant.robot` file
-- the some common routines for automating Java application in `tasks.robot` file
-- Python code example how to work with the library in `task.py` file
 
 ### Configurations
 
-1. The path to the Java access bridge DLL is given directly is given directly in the Robot implementations (`tasks.robot`, `assistant.robot`) as library init parameter `access_bridge_path`. Alternative is to set environment variable `RC_JAVA_ACCESS_BRIDGE_DLL` to the DLL location.
-2. Also library init parameter `ignore_callbacks=True` is set as this is case especially for
-older Java applications.
+1. The path to the Java access bridge DLL needs to be with set environment variable `RC_JAVA_ACCESS_BRIDGE_DLL`.
+2. Also library init parameter `ignore_callbacks=True` is set as this is case especially for older Java applications.
 
 ### Background story
 
