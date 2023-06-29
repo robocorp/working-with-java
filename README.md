@@ -24,11 +24,15 @@ The current recommended way of inspecting Java application element structure is 
 
 **Note.** Contents of this repository are still under work and due to change!
 
+## Locator tree
+
+The **locator tree** is a representation of the locators (usable by the RPA.JavaAccessBridge library) for each of the Java application's elements and this can be output with library keyword ``Print Locator Tree`` (keyword was added in rpaframework release 23.5.0.
+
 ## Element tree
 
 The **element tree** is a representation of the Java application's structure and this can be output with library keyword ``Print Element Tree``.
 
-Important aspect to note about element tree is that it is representation of the **current state** of the application. If application page structure changes in any way then usual method is to call library keyword ``Application Refresh`` so that library's internal model of the structure is updated.
+Important aspect to note about element/locator tree is that it is representation of the **current state** of the application. If application page structure changes in any way then usual method is to call library keyword ``Application Refresh`` so that library's internal model of the structure is updated.
 
 ## Iterating Java context tree
 
