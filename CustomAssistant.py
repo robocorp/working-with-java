@@ -60,9 +60,9 @@ class CustomAssistant(Assistant):
                                 text,
                                 size=12,
                                 selectable=True,
-                                color="blue200"
+                                color="#FF0000"
                                 if find and find.lower() in text.lower()
-                                else "white"
+                                else "black"
                                 # opacity=1 if find and find in text else 0.5,
                             ),
                         ),
@@ -72,7 +72,7 @@ class CustomAssistant(Assistant):
 
         dt = DataTable(
             # width=700,
-            # bgcolor="white",
+            bgcolor="#E0E0E0",
             border_radius=1,
             heading_row_color="black",
             heading_row_height=0,
