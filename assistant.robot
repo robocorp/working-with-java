@@ -148,7 +148,7 @@ Select Java Window
         ELSE
             Add text    Target: ${{ $selected_java_window.title }}
             IF    not ${JAVA_WINDOW_SELECTED}
-                Select Window By Title    ${{ $selected_java_window.title }}
+                Select Window By Title    ${{ $selected_java_window.title }}    foreground=${FALSE}
                 Set Global Variable    ${JAVA_WINDOW_SELECTED}    ${TRUE}
                 Set Global Variable    ${SELECTED_WINDOW_NAME}    ${{ $selected_java_window.title }}
             END
@@ -200,7 +200,7 @@ Inspect Tree
 List Element Roles
     [Arguments]    ${result}
     Set Global Variable    ${SELECTED_WINDOW_NAME}    ${result}[selected_java_window]
-    Select Window By Title    ${SELECTED_WINDOW_NAME}
+    Select Window By Title    ${SELECTED_WINDOW_NAME}    bring_foreground=${FALSE}
     Application Refresh
     ${lib}=    Get Library Instance    Java
     # TODO. ITERATE CONTEXT TREE to count roles etc
@@ -215,7 +215,7 @@ List Element Roles
     Refresh Dialog
 
 Traversing Element Tree
-    Select Window By Title    ${SELECTED_WINDOW_NAME}
+    Select Window By Title    ${SELECTED_WINDOW_NAME}    bring_foreground=${FALSE}
     # ${tree}=    Print Element Tree
     ${lib}=    Get Library Instance    Java
     # TODO. ITERATE CONTEXT TREE to count roles etc
@@ -245,7 +245,7 @@ Back To Main Menu
 Write locator tree to file
     [Arguments]    ${result}
     Set Global Variable    ${SELECTED_WINDOW_NAME}    ${result}[selected_java_window]
-    Select Window By Title    ${SELECTED_WINDOW_NAME}
+    Select Window By Title    ${SELECTED_WINDOW_NAME}    bring_foreground=${FALSE}
     Application Refresh
     ${tree}=    Print Locator Tree
     Create file    ${LOCATOR_TREE_FILE}    content=${tree}    overwrite=${True}
@@ -256,7 +256,7 @@ List locator tree
     [Documentation]    Action shows all text, image and icon components
     [Arguments]    ${result}
     Set Global Variable    ${SELECTED_WINDOW_NAME}    ${result}[selected_java_window]
-    Select Window By Title    ${SELECTED_WINDOW_NAME}
+    Select Window By Title    ${SELECTED_WINDOW_NAME}    bring_foreground=${FALSE}
     Application Refresh
     # Clear Dialog
 

@@ -6,12 +6,17 @@ This repository contains some helpful (hopefully :) ) tips for the developer on 
 Java applications. Especially concentrating on Java application element structure and
 building locators that work.
 
-Recent ``rpaframework`` have included improvements on how to interact with Java application information. It is now possible for example to iterate through Java structures although improvements on the library part are still going to be improved in the future releases. It is also possible to test locators against output from keyword ``Print Element Tree`` even when target Java application is not running.
+Recent ``rpaframework`` have included improvements on how to interact with Java application information. It is now possible for example to iterate through Java structures although improvements on the library part are still going to be improved in the future releases.
+
+The locator for each element of the application can be using `View locator Tree` button.
+
+It is also possible to test locators against output from keyword ``Print Element Tree`` even when target Java application is not running, [read more](#using-command-line-tool-java_tree_reader).
 
 Repository consists:
 
 - example Java application `BasicSwing.jar` which is used in ``rpaframework`` testing
-- [RPA.Assistant](https://robocorp.com/docs/libraries/rpa-framework/rpa-assistant) based implementation of developer "Java inspector tool" in `assistant.robot` file
+- a customized [RPA.Assistant](https://robocorp.com/docs/libraries/rpa-framework/rpa-assistant) `CustomAssistant.py`
+- the Assistant implementation in `assistant.robot` file
 
 ### Configurations
 
@@ -26,7 +31,7 @@ The current recommended way of inspecting Java application element structure is 
 
 ## Locator tree
 
-The **locator tree** is a representation of the locators (usable by the RPA.JavaAccessBridge library) for each of the Java application's elements and this can be output with library keyword ``Print Locator Tree`` (keyword was added in rpaframework release 23.5.0.
+The **locator tree** is a representation of the locators (usable by the `RPA.JavaAccessBridge` library) for each of the Java application's elements and this can be output with library keyword ``Print Locator Tree`` (keyword was added in rpaframework release 23.5.0).
 
 ## Element tree
 
@@ -97,24 +102,27 @@ Assistant will automatically use `Select Window` to get access Java available on
 
 <img src="images/assistant.png" style="margin-bottom:20px">
 
-Assistant can be used to test locator against visible and selected Java application by entering locator into input field and then by clicking `Inspect` (the hidden elements can be seen in inspect result by unchecking `Only visible` checkbox) .
+Assistant can be used to test locator against visible and selected Java application by entering locator into input field and then by clicking `Inspect Locator` (the hidden elements can be seen in inspect result by unchecking `Only visible` checkbox).
 
-The `Refresh` button can be used to call `Application Refresh` keyword of the library.
+The `Load/Refresh element tree` button can be used to call `Application Refresh` keyword of the library.
 
 The `List element roles` button lists all possible different element roles and their count on the application view.
 
-The `Check element tree` opens the application's element tree on new page for view. On a condensed table the element's level on the hierarchy, role, name and coordinates are shown. If element does not have coordinates that are clickable (positive coordinates) then instead of coordinates text "NOT VISIBLE" is shown.
+The `View locator tree` opens the application's element tree on new page for view. On a condensed table the button to copy row's locator to clipboard and locator for the element is shown. The `|` characters mark the
+depth of the element in the application's element tree.
 
-<img src="images/check_element_tree.png" style="margin-bottom:20px">
+<img src="images/locator_tree_txt.png" style="margin-bottom:20px">
 
-## Using command line tool `java_tree_reader`
+## Using command line tool java_tree_reader
 
 The `java_tree_reader` command line tool is available in Robot's Python environment, which can be launched with Robocorp Extension's `Open Robot Terminal`.
 
 This tool takes in 2 input arguments, first the path to the element tree output file and second the locator you want to run against that element tree output to check for matches.
 
+Command works with `element tree`, which can be saved using `Write locator tree to file` button in the Assistant UI. Button action will save both `locator tree` and `element tree` into Assistant's **output** folder.
+
 ```bash
-java_tree_reader   elementtree.txt   role:push button and name:Send
+java_tree_reader ./output/element-tree.txt role:push button
 ```
 
 <img src="images/java_tree_reader.png" style="margin-bottom:20px">
@@ -125,3 +133,4 @@ java_tree_reader   elementtree.txt   role:push button and name:Send
 - [Robocorp Developer Training Courses](https://robocorp.com/docs/courses)
 - [Documentation links on Robot Framework](https://robocorp.com/docs/languages-and-frameworks/robot-framework)
 - [Example bots in Robocorp Portal](https://robocorp.com/portal)
+- [Java locators](https://robocorp.com/docs/development-guide/locators#java-locators)

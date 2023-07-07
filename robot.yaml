@@ -3,7 +3,7 @@
 
 tasks:
   # Task names here are used when executing the bots, so renaming these is recommended.
-  Assistant:
+  Java Assistant:
     robotTaskName: Assistant Main
   Start example Java app:
     shell: java -jar BasicSwing.jar "Chat Frame"
