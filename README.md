@@ -96,8 +96,9 @@ java -jar BasicSwing.jar "Oracle Applications"
 
 Probably the most interesting approach on how to work with Java applications is the Assistant application implementation.
 
+Task to launch with `Robocorp Code` VS Code extension.
 ```bash
-Robocorp Task: Assistant
+Java Assistant
 ```
 
 The assistant will automatically use `Select Window` to get access to Java available on the system.
