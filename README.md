@@ -6,6 +6,8 @@ This repository contains some helpful (hopefully :) ) tips for the developer on 
 Java applications. Especially concentrating on Java application element structure and
 building locators that work.
 
+Direct [link](#using-robocorp-java-assistant-to-inspect-java-application) to the Java assistant window description.
+
 Recent ``rpaframework`` have included improvements on how to interact with Java application information. It is now possible for example to iterate through Java structures although improvements on the library part are still going to be improved in the future releases.
 
 The locator for each element of the application can be using `View locator Tree` button.
@@ -90,15 +92,15 @@ for example.
 java -jar BasicSwing.jar "Oracle Applications"
 ```
 
-## Using Robocorp Assistant to inspect Java application
+## Using Robocorp Java Assistant to inspect Java application
 
-Probably most interesting approach on how to work with Java application is the Assistant application implementation.
+Probably the most interesting approach on how to work with Java applications is the Assistant application implementation.
 
 ```bash
 Robocorp Task: Assistant
 ```
 
-Assistant will automatically use `Select Window` to get access Java available on the system.
+The assistant will automatically use `Select Window` to get access to Java available on the system.
 
 <img src="images/assistant.png" style="margin-bottom:20px">
 
