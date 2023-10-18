@@ -5,6 +5,8 @@ tasks:
   # Task names here are used when executing the bots, so renaming these is recommended.
   Java Assistant:
     robotTaskName: Assistant Main
+  Java Assistant With Trace:
+    shell: python -m robot -d output -L TRACE --logtitle "Task log" --task "Assistant Main" assistant.robot
   Start example Java app:
     shell: java -jar BasicSwing.jar "Chat Frame"
 

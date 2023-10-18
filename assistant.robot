@@ -148,7 +148,7 @@ Select Java Window
         ELSE
             Add text    Target: ${{ $selected_java_window.title }}
             IF    not ${JAVA_WINDOW_SELECTED}
-                Select Window By Title    ${{ $selected_java_window.title }}    foreground=${FALSE}
+                Select Window By Title    ${{ $selected_java_window.title }}    bring_foreground=${FALSE}
                 Set Global Variable    ${JAVA_WINDOW_SELECTED}    ${TRUE}
                 Set Global Variable    ${SELECTED_WINDOW_NAME}    ${{ $selected_java_window.title }}
             END
